@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\BlacklistRequest;
 use Cashbee\Jobs\ProcessThirdPartyBlacklist;
 use Cashbee\Models\Blacklist;
@@ -23,7 +24,7 @@ class BlackListController extends Controller
     public function checkBlacklist(BlacklistRequest $request)
     {
         try {
-            $ProcessThirdPartyBlacklist = new ProcessThirdPartyBlacklist(
+            $response = (new ProcessThirdPartyBlacklist(
                 $request->get('mobile_number'),
                 $request->get('name'),
                 $request->get('country_code'),
@@ -31,8 +32,7 @@ class BlackListController extends Controller
                 $request->get('identification_number'),
                 $request->get('front_of_id_card'),
                 $request->get('birthdate')
-            );
-            $response = $ProcessThirdPartyBlacklist->handle();
+            ))->handle();
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
