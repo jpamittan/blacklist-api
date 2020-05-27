@@ -37,6 +37,6 @@ class BlackListController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
 
-        return $response;
+        return response()->json(['result' => $response], 200);
     }
 }
