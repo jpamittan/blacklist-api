@@ -5,15 +5,15 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BlacklistRequest;
-use Cashbee\Jobs\ProcessThirdPartyBlacklist;
-use Cashbee\Models\Blacklist;
+use Cashbee\Jobs\{ ProcessThirdPartyBlacklist };
+use Cashbee\Models\{ Blacklist as BlacklistModel };
 
 class BlackListController extends Controller
 {
     public function getBlacklist(string $mobileNumber)
     {
         try {
-            $response = BlackList::whereMobileNumber($mobileNumber);
+            $response = BlacklistModel::whereMobileNumber($mobileNumber);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
