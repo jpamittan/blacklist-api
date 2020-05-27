@@ -6,16 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class SystemSetting extends Model
 {
-    protected $fillable = ['type', 'settings'];
+    protected $fillable = ['enabled', 'group', 'type', 'settings'];
 
     protected $casts = [
         'settings' => 'array'
     ];
-
-    public function scopeGetRewards($query)
-    {
-        return $query->where('type', 'rewards_by_withdrawal_channel');
-    }
 
     public function scopeGetAdvanceCredentials($query)
     {

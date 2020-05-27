@@ -5,8 +5,7 @@ namespace Cashbee\Services\AI;
 use Cashbee\Services\AI\StarDetect\FaceAPI as StarDetectFaceAPI;
 use Cashbee\Services\AI\AdvanceAI\FaceAPI as AdvanceAIDetectFaceAPI;
 use Cashbee\Services\AI\AdvanceAI\Blacklist as AdvanceAIBlacklistAPI;
-
-use Cashbee\Models\{ Customer, BlacklistLog, Order, OrderLog, User, Blacklist as BlacklistModel, ThirdPartyApiLog };
+use Cashbee\Models\{ BlacklistLog, Blacklist as BlacklistModel, ThirdPartyApiLog };
 
 class ThirdPartyBlacklistCheckService
 {

@@ -13,24 +13,15 @@ class Blacklist extends AdvancedGuardianAbstract
     private $name;
     private $idNumber;
 
-    /**
-     * Instantiate API name and ID type mappings
-     */
-    public function __construct(Customer $customer)
+    public function __construct($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate)
     {
-        parent::__construct($customer);
+        parent::__construct($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate);
         $getAdvanceThirdPartyBlacklist = SystemSetting::GetAdvanceThirdPartyBlacklist()->get()->first();
         $this->blackListCheckEnabled = $getAdvanceThirdPartyBlacklist->enabled;
         $this->api_name = $getAdvanceThirdPartyBlacklist->settings["api_name"];
         $this->id_type_mappings = $getAdvanceThirdPartyBlacklist->settings["id_type_mappings"];
     }
 
-    /**
-     * Create Blacklist Log Data to be save in database
-     *
-     * @param object $response
-     * @return array
-     */
     public function provideBlacklistLogData(object $response): array
     {
         $score = 0;
@@ -41,49 +32,32 @@ class Blacklist extends AdvancedGuardianAbstract
         }
 
         return [
-            'source'            => 'advance_ai_blacklist',
-            'source_response'   => $response,
-            'blacklisted'       => $response->data->hitIdNumber ?? $response->data->hitPhoneNumber ?? $response->data->hitNameAndBirthday,
-            'score'             => $score,
-            'customer_id'       => $this->customer->id
+            'source'          => 'advance_ai_blacklist',
+            'source_response' => $response,
+            'blacklisted'     => $response->data->hitIdNumber ?? $response->data->hitPhoneNumber ?? $response->data->hitNameAndBirthday,
+            'score'           => $score,
+            'mobile_number'   => $this->mobileNumber
         ];
     }
 
-    /**
-     * Check in Advance AI if a customer is blacklisted
-     *
-     * @return object
-     */
     public function process(): ?object
     {
         if (! ($this->advancedAIEnabled && $this->blackListCheckEnabled)) {
             return null;
         }
-
         $this->fillEmptyFields();
-        $idType = $this->setIDType($this->customer->identification_type);
+        $idType = $this->setIDType($this->identificationType);
         $result = $this->api->request($this->api_name, $this->setBlacklistRequestData($idType));
 
         return json_decode($result);
     }
 
-    /**
-     * Fill customer's name and identification number by default values if empty
-     *
-     * @return void
-     */
     public function fillEmptyFields(): void
     {
-        $this->name = (preg_match("/[a-z]/i", $this->customer->name)) ? $this->customer->name : "AAA";
-        $this->idNumber = (! empty($this->customer->identification_number)) ? $this->customer->identification_number : "999999999";
+        $this->name = (preg_match("/[a-z]/i", $this->name)) ? $this->name : "AAA";
+        $this->idNumber = (! empty($this->identificationNumber)) ? $this->identificationNumber : "999999999";
     }
 
-    /**
-     * Set Adnvance AI ID type
-     *
-     * @param string $identificationType
-     * @return string
-     */
     public function setIDType(string $identificationType): string
     {
         $type = 'OTHERS';
@@ -99,21 +73,15 @@ class Blacklist extends AdvancedGuardianAbstract
         return $type;
     }
 
-    /**
-     * Set request data before sending to Advance AI Blacklist Check
-     *
-     * @param string $idType
-     * @return void
-     */
     public function setBlacklistRequestData(string $idType): array
     {
         return [
             'name' => strtoupper($this->name),
             'idType' => $idType,
             'idNumber' => $this->idNumber,
-            'phoneNumber' => $this->customer->account_phone,
-            'md5PhoneNumber' => md5($this->customer->account_phone),
-            'birthDay' => $this->customer->birthdate
+            'phoneNumber' => $this->mobileNumber,
+            'md5PhoneNumber' => md5($this->mobileNumber),
+            'birthDay' => $this->birthdate
         ];
     }
 }

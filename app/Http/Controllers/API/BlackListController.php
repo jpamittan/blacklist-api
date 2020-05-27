@@ -9,11 +9,11 @@ use Cashbee\Models\Blacklist;
 
 class BlackListController extends Controller
 {
-    public function getBlacklist(Request $request)
+    public function getBlacklist(string $mobileNumber)
     {
         try {
 
-            $response = BlackList::whereMobileNumber($request->get('phoneNumber'));
+            $response = BlackList::whereMobileNumber($mobileNumber);
 
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
@@ -26,7 +26,16 @@ class BlackListController extends Controller
     {
         try {
 
-            $response = ProcessThirdPartyBlacklist::dispatch($request->get('phoneNumber'));
+            $ProcessThirdPartyBlacklist = new ProcessThirdPartyBlacklist(
+                $request->get('mobile_number'),
+                $request->get('name'),
+                $request->get('country_code'),
+                $request->get('identification_type'),
+                $request->get('identification_number'),
+                $request->get('front_of_id_card'),
+                $request->get('birthdate')
+            );
+            $response = $ProcessThirdPartyBlacklist->handle();
 
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
