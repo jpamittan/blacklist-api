@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6558f74828bca9ebecac73d90cea4b1a",
+    "content-hash": "d893ba33973957d904b98e0ff5d0993b",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3430,6 +3430,45 @@
                 "php"
             ],
             "time": "2020-05-26T06:40:44+00:00"
+        },
+        {
+            "name": "zackijack/advance-ai-sdk",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zackijack/advance-ai-sdk-php.git",
+                "reference": "9e3b0e3379ed5044b2b7a111fda2910d45aa0410"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zackijack/advance-ai-sdk-php/zipball/9e3b0e3379ed5044b2b7a111fda2910d45aa0410",
+                "reference": "9e3b0e3379ed5044b2b7a111fda2910d45aa0410",
+                "shasum": ""
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "Zackyjack\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Zackky Muhammad",
+                    "email": "m.zackky@gmail.com"
+                }
+            ],
+            "description": "A PHP SDK for Advance.AI",
+            "keywords": [
+                "advance",
+                "advance.ai",
+                "ai",
+                "sdk"
+            ],
+            "time": "2018-03-16T09:03:52+00:00"
         }
     ],
     "packages-dev": [
