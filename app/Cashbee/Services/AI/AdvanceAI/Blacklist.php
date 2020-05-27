@@ -10,8 +10,7 @@ class Blacklist extends AdvancedGuardianAbstract
     protected $api_name;
     protected $id_type_mappings;
     protected $blackListCheckEnabled;
-    private $name;
-    private $idNumber;
+    protected $idNumber;
 
     public function __construct($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate)
     {
