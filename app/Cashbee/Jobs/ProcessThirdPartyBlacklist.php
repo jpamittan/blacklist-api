@@ -83,11 +83,11 @@ class ProcessThirdPartyBlacklist
     protected function _addCustomerToBlacklist($typeName = '')
     {
         $mobileNumber = str_replace('+', '', $this->mobileNumber);
-        $blacklist = BlacklistModel::whereMobileNumber($mobileNumbe)->first();
+        $blacklist = BlacklistModel::whereMobileNumber($mobileNumber)->first();
         if (! $blacklist) {
             $blacklist = new BlacklistModel();
         }
-        $blacklist->mobile_number = $mobileNumbe;
+        $blacklist->mobile_number = $mobileNumber;
         $blacklist->name = $this->name;
         $blacklist->type = $typeName;
         $blacklist->save();
