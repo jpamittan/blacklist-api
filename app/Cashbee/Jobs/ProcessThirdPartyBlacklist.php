@@ -14,6 +14,10 @@ class ProcessThirdPartyBlacklist
     protected $advanceAIBlacklistAPI;
     protected $mobileNumber;
     protected $name;
+    protected $identification_type;
+    protected $identification_number;
+    protected $birthdate;
+    protected $front_of_id_card;
 
     public function __construct($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate)
     {
@@ -22,6 +26,10 @@ class ProcessThirdPartyBlacklist
         $this->advanceAIBlacklistAPI  = new AdvanceAIBlacklistAPI($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate);
         $this->mobileNumber           = $mobile_number;
         $this->name                   = $name;
+        $this->identification_type    = $idtype;
+        $this->identification_number  = $idNumber;
+        $this->birthdate              = $bdate;
+        $this->front_of_id_card       = $frontId;
     }
 
     public function handle()
@@ -87,9 +95,13 @@ class ProcessThirdPartyBlacklist
         if (! $blacklist) {
             $blacklist = new BlacklistModel();
         }
-        $blacklist->mobile_number = $mobileNumber;
-        $blacklist->name = $this->name;
-        $blacklist->type = $typeName;
+        $blacklist->mobile_number         = $mobileNumber;
+        $blacklist->name                  = $this->name;
+        $blacklist->identification_type   = $this->identification_type;
+        $blacklist->identification_number = $this->identification_number;
+        $blacklist->birthdate             = $this->birthdate;
+        $blacklist->front_of_id_card      = $this->front_of_id_card;
+        $blacklist->type                  = $typeName;
         $blacklist->save();
     }
 }

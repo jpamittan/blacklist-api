@@ -9,12 +9,15 @@ class CreateBlacklistsTable extends Migration
     public function up()
     {
         Schema::create('blacklists', function (Blueprint $table) {
-            $table->bigIncrements('id',20);
-            $table->string('mobile_number')->nullable()->default('NULL');
-            $table->string('name')->nullable()->default('NULL');
-            $table->string('type')->nullable()->default('NULL');
-            $table->timestamp('created_at')->nullable()->default('NULL');
-            $table->timestamp('updated_at')->nullable()->default('NULL');
+            $table->bigIncrements('id');
+            $table->string('mobile_number')->nullable();
+            $table->string('name')->nullable();
+            $table->string('identification_type')->nullable();
+            $table->string('identification_number')->nullable();
+            $table->date('birthdate')->nullable();
+            $table->text('front_of_id_card')->nullable();
+            $table->string('type')->nullable();
+            $table->timestamps(0);
         });
     }
 

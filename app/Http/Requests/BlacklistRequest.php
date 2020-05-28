@@ -32,7 +32,15 @@ class BlacklistRequest extends FormRequest
             'identification_type'   => 'required',
             'identification_number' => 'required',
             'front_of_id_card'      => 'required|regex:' . $urlRegex,
-            'birthdate'             => 'required'
+            'birthdate'             => 'required',
+            
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'front_of_id_card.regex' => 'The format must be a valid URL.'
         ];
     }
 }

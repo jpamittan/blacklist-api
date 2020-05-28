@@ -9,13 +9,12 @@ class CreateSystemSettingsTable extends Migration
     public function up()
     {
         Schema::create('system_settings', function (Blueprint $table) {
-            $table->bigIncrements('id',20);
-            $table->tinyInteger('enabled',4)->default('0');
-            $table->string('group')->nullable()->default('NULL');
+            $table->bigIncrements('id');
+            $table->tinyInteger('enabled')->default('0');
+            $table->string('group')->nullable();
             $table->string('type');
-            $table->text('settings')->nullable()->default('NULL');
-            $table->timestamp('created_at')->nullable()->default('NULL');
-            $table->timestamp('updated_at')->nullable()->default('NULL');
+            $table->text('settings')->nullable();
+            $table->timestamps(0);
         });
     }
 

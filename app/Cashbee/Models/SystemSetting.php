@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class SystemSetting extends Model
 {
-    protected $fillable = ['enabled', 'group', 'type', 'settings'];
+    protected $fillable = [
+        'enabled',
+        'group',
+        'type',
+        'settings'
+    ];
 
     protected $casts = [
         'settings' => 'array'

@@ -9,14 +9,13 @@ class CreateBlacklistLogsTable extends Migration
     public function up()
     {
         Schema::create('blacklist_logs', function (Blueprint $table) {
-            $table->bigIncrements('id',20);
+            $table->bigIncrements('id');
             $table->string('mobile_number');
-            $table->string('score')->nullable()->default('NULL');
+            $table->string('score')->nullable();
             $table->string('source');
-            $table->text('source_response')->nullable()->default('NULL');
-            $table->tinyInteger('blacklisted',1)->default('0');
-            $table->timestamp('created_at')->nullable()->default('NULL');
-            $table->timestamp('updated_at')->nullable()->default('NULL');
+            $table->text('source_response')->nullable();
+            $table->tinyInteger('blacklisted')->default('0');
+            $table->timestamps(0);
         });
     }
 

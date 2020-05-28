@@ -9,14 +9,13 @@ class CreateThirdPartyApiLogsTable extends Migration
     public function up()
     {
         Schema::create('third_party_api_logs', function (Blueprint $table) {
-            $table->bigIncrements('id',20);
-            $table->string('mobile_number')->nullable()->default('NULL');
+            $table->bigIncrements('id');
+            $table->string('mobile_number')->nullable();
             $table->string('type')->default('blacklist');
-            $table->string('service_name')->nullable()->default('NULL');
-            $table->string('module_name')->nullable()->default('NULL');
-            $table->text('response_data')->nullable()->default('NULL');
-            $table->timestamp('created_at')->nullable()->default('NULL');
-            $table->timestamp('updated_at')->nullable()->default('NULL');
+            $table->string('service_name')->nullable();
+            $table->string('module_name')->nullable();
+            $table->text('response_data')->nullable();
+            $table->timestamps(0);
         });
     }
 

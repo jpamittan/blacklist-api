@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BlacklistRequest;
-use Cashbee\Jobs\{ ProcessThirdPartyBlacklist };
+use Cashbee\Jobs\ProcessThirdPartyBlacklist;
 use Cashbee\Models\{ Blacklist as BlacklistModel };
 
 class BlackListController extends Controller
