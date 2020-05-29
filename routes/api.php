@@ -16,5 +16,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::namespace('API')->group(function () {
     Route::get('blacklist/{mobileNumber}', 'BlackListController@getBlacklist');
+    Route::get('blacklist/name/{fname}/{lname}', 'BlackListController@getBlacklistByName');
     Route::post('blacklist', 'BlackListController@checkBlacklist');
 });
