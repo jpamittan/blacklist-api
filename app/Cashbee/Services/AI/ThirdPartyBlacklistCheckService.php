@@ -12,126 +12,96 @@ class ThirdPartyBlacklistCheckService
     protected $stardetectfaceAPI;
     protected $advanceAIDetectFaceAPI;
     protected $advanceAIBlacklistAPI;
+    protected $mobileNumber;
+    protected $name;
+    protected $identification_type;
+    protected $identification_number;
+    protected $birthdate;
+    protected $front_of_id_card;
 
-    protected $customer;
-    protected $order;
-
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct(Customer $customer, Order $order)
+    public function __construct($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate)
     {
-        $this->stardetectfaceAPI        = new StarDetectFaceAPI;
-        $this->advanceAIDetectFaceAPI   = new AdvanceAIDetectFaceAPI;
-        $this->advanceAIBlacklistAPI    = new AdvanceAIBlacklistAPI($customer);
-
-        $this->customer                 = $customer;
-        $this->order                    = $order;
+        $this->stardetectfaceAPI      = new StarDetectFaceAPI($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate);
+        $this->advanceAIDetectFaceAPI = new AdvanceAIDetectFaceAPI($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate);
+        $this->advanceAIBlacklistAPI  = new AdvanceAIBlacklistAPI($mobile_number, $name, $cCode, $idtype, $idNumber, $frontId, $bdate);
+        $this->mobileNumber           = $mobile_number;
+        $this->name                   = $name;
+        $this->identification_type    = $idtype;
+        $this->identification_number  = $idNumber;
+        $this->birthdate              = $bdate;
+        $this->front_of_id_card       = $frontId;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
     {
-        // Check First if Already Rejected ...
-        $this->order->refresh();
-        if ($this->order->status->system_name == 'reject') {
-            return false;
-        }
-
-        $thirdPartyApiLogCheckForToday = ThirdPartyApiLog::whereServiceName('cashbee-thirdparty-log')
+        $thirdPartyApiLogCheckForToday = ThirdPartyApiLog::whereServiceName('thirdparty-log')
             ->whereDate('created_at', date('Y-m-d'))
-            ->whereCustomerId($this->customer->id)
+            ->whereMobileNumber($this->mobileNumber)
             ->first();
 
-        // If have record today ...
-        // Do not proceed ...
         if ($thirdPartyApiLogCheckForToday) {
             return false;
         }
 
-        ThirdPartyApiLog::create([
-            'customer_id' => $this->customer->id,
-            'type' => 'blacklist',
-            'service_name' => 'cashbee-thirdparty-log',
-            'module_name' => 'cashbee-thirdparty-check',
-            'response_data' => []
-        ]);
-
-        // Advanced AI Blacklist ...
         $response = $this->advanceAIBlacklistAPI->process();
         if (isset($response->data) &&
             ($response->data->hitIdNumber || $response->data->hitPhoneNumber || $response->data->hitNameAndBirthday)) {
-            // update to Reject ...
-            $this->_addCustomerToBlacklist($this->customer, 'advance-ai-blacklist-api');
+            $this->_addCustomerToBlacklist('advance-ai-blacklist-api');
+            $this->_addThirdPartyLog($response);
             $this->_addBlacklistLog($this->advanceAIBlacklistAPI->provideBlacklistLogData($response));
-            return false;
+            return true;
         }
 
-        $response = $this->advanceAIDetectFaceAPI->process($this->customer);
+        $response = $this->advanceAIDetectFaceAPI->process();
         if (isset($response->data) && $response->data->hitCount > 0) {
-            // Update to Reject ...
-            $this->_addCustomerToBlacklist($this->customer, 'advance-ai-face-api');
-            $this->_addBlacklistLog($this->advanceAIDetectFaceAPI->provideBlacklistLogData($this->customer, $response));
-            return false;
+            $this->_addCustomerToBlacklist('advance-ai-face-api');
+            $this->_addThirdPartyLog($response);
+            $this->_addBlacklistLog($this->advanceAIDetectFaceAPI->provideBlacklistLogData($response));
+            return true;
         }
 
-        $response = $this->stardetectfaceAPI->process($this->customer);
+        $response = $this->stardetectfaceAPI->process();
         $starDetectorScore = isset($response['result'][0]) ? (int) $response['result'][0]['score'] : 0;
         if ($starDetectorScore > 0) {
-            // Update to Reject ...
-            $this->_addCustomerToBlacklist($this->customer, 'star-detect-face-api');
-            $this->_addBlacklistLog($this->stardetectfaceAPI->provideBlacklistLogData($this->customer, $response));
-            return false;
+            $this->_addCustomerToBlacklist('star-detect-face-api');
+            $this->_addThirdPartyLog($response);
+            $this->_addBlacklistLog($this->stardetectfaceAPI->provideBlacklistLogData($response));
+            return true;
         }
 
-        // No BlackList ...
-        return true;
+        return false;
     }
 
     protected function _addBlacklistLog($data)
     {
-        $aiRobotUser = User::whereEmail('ai-robot@cashjeep.ph')->first();
-
-        $reason = 'Is Blacklisted on Third Party Source: ' . $data['source'];
-
-        $lastOrderStatusId = $this->order->status_id;
-        $this->order->setStatus('reject');
-        $this->order->refresh();
-
-        // Create BlackListLog ...
         BlacklistLog::create($data);
+    }
 
-        OrderLog::create([
-            'order_id' => $this->order->id,
-            'previous_status_id' => $lastOrderStatusId,
-            'current_status_id' => $this->order->status_id,
-            'event_name' => "third_party_blacklist_reject_order",
-            'operator_id' => $aiRobotUser->id,
-            'remarks' => $reason,
-            'reason' => $reason
+    protected function _addThirdPartyLog($response)
+    {
+        ThirdPartyApiLog::create([
+            'mobile_number' => $this->mobileNumber,
+            'type' => 'blacklist',
+            'service_name' => 'thirdparty-log',
+            'module_name' => 'thirdparty-check',
+            'response_data' => $response
         ]);
     }
 
-    protected function _addCustomerToBlacklist(Customer $customer, $typeName = '')
+    protected function _addCustomerToBlacklist($typeName = '')
     {
-        $accountPhone = str_replace('+', '', $customer->account_phone);
-
-        $blacklist = BlacklistModel::whereMobileNumber($accountPhone)->first();
-
+        $mobileNumber = str_replace('+', '', $this->mobileNumber);
+        $blacklist = BlacklistModel::whereMobileNumber($mobileNumber)->first();
         if (! $blacklist) {
             $blacklist = new BlacklistModel();
         }
-
-        $blacklist->customer_id = $customer->id;
-        $blacklist->mobile_number = $accountPhone;
-        $blacklist->name = $customer->name;
-        $blacklist->type = $typeName;
+        $blacklist->mobile_number         = $mobileNumber;
+        $blacklist->name                  = $this->name;
+        $blacklist->identification_type   = $this->identification_type;
+        $blacklist->identification_number = $this->identification_number;
+        $blacklist->birthdate             = $this->birthdate;
+        $blacklist->front_of_id_card      = $this->front_of_id_card;
+        $blacklist->type                  = $typeName;
         $blacklist->save();
     }
 }

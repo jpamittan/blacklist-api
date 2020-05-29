@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BlacklistRequest;
-use Cashbee\Jobs\ProcessThirdPartyBlacklist;
+use Cashbee\Services\AI\ThirdPartyBlacklistCheckService;
 use Cashbee\Models\{ Blacklist as BlacklistModel };
 
 class BlackListController extends Controller
@@ -24,7 +24,7 @@ class BlackListController extends Controller
     public function checkBlacklist(BlacklistRequest $request): object
     {
         try {
-            $response = (new ProcessThirdPartyBlacklist(
+            $response = (new ThirdPartyBlacklistCheckService(
                 $request->get('mobile_number'),
                 $request->get('name'),
                 $request->get('country_code'),
