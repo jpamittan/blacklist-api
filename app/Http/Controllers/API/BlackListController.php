@@ -10,10 +10,10 @@ use Cashbee\Models\{ Blacklist as BlacklistModel };
 
 class BlackListController extends Controller
 {
-    public function getBlacklist(string $mobileNumber)
+    public function getBlacklist(string $mobileNumber): BlacklistModel
     {
         try {
-            $response = BlacklistModel::whereMobileNumber($mobileNumber);
+            $response = BlacklistModel::whereMobileNumber($mobileNumber)->first();
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -21,7 +21,7 @@ class BlackListController extends Controller
         return $response;
     }
 
-    public function checkBlacklist(BlacklistRequest $request)
+    public function checkBlacklist(BlacklistRequest $request): object
     {
         try {
             $response = (new ProcessThirdPartyBlacklist(
